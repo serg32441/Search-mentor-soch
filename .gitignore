@@ -2,44 +2,27 @@
 # Dependencies
 node_modules/
 
-# Build outputs
+# Build artifacts
 dist/
 build/
-target/
+*.min.js
+*.min.css
+*.bundle.js
 
-# TypeScript
-*.tsbuildinfo
-.next/
-.nuxt/
-.un~lock
+# Logs and temp files
+*.log
+*.tmp
 
-# Environment variables
+# Environment
 .env
 .env.local
-.env.*
+*.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# OS files
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Logs
-*.log
-
-# Coverage
-coverage/
-htmlcov/
-.coverage
-
-# Python cache (if any Python files exist)
-__pycache__/
-*.pyc
-*.pyo
-*.pyd
-.Python
 ```

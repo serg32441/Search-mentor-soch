@@ -5,39 +5,41 @@ node_modules/
 # Build outputs
 dist/
 build/
-coverage/
-htmlcov/
+target/
+
+# TypeScript
+*.tsbuildinfo
+.next/
+.nuxt/
+.un~lock
 
 # Environment variables
 .env
 .env.local
 .env.*
 
-# IDE and editor settings
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# Logs
-*.log
-
-# OS generated files
+# OS files
 .DS_Store
 Thumbs.db
 
-# TypeScript build info
-*.tsbuildinfo
+# Logs
+*.log
 
-# Package lock files
-package-lock.json
+# Coverage
+coverage/
+htmlcov/
+.coverage
 
-# Temporary files
-*.tmp
-
-# System files
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
+# Python cache (if any Python files exist)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
 ```

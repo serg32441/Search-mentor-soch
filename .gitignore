@@ -1,4 +1,4 @@
 ```
-# Static site hosting
-public/_redirects
+# Build artifacts
+dist/
 ```

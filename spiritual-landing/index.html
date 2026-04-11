@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск духовного наставника</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">✝️ ДухНаставник</div>
+            <nav class="nav">
+                <a href="#home">Главная</a>
+                <a href="#priests">Священники</a>
+                <a href="#publications">Публикации</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>Найдите своего духовного наставника</h1>
+            <p>Христианские священники разных конфессий готовы помочь вам на пути веры</p>
+            
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Поиск по имени или городу...">
+                <select id="denominationFilter">
+                    <option value="">Все конфессии</option>
+                    <option value="Православие">Православие</option>
+                    <option value="Католицизм">Католицизм</option>
+                    <option value="Протестантизм">Протестантизм</option>
+                </select>
+                <button onclick="filterPriests()">Найти</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Priests Section -->
+    <section id="priests" class="priests-section">
+        <div class="container">
+            <h2>Наши священники</h2>
+            <div class="priests-grid" id="priestsGrid">
+                <!-- Карточки будут добавлены через JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Publications Section -->
+    <section id="publications" class="publications-section">
+        <div class="container">
+            <h2>Публикации</h2>
+            <div class="publications-list" id="publicationsList">
+                <!-- Публикации будут добавлены через JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Message Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h3>Написать сообщение</h3>
+            <p id="modalPriestName"></p>
+            <form id="messageForm" onsubmit="sendMessage(event)">
+                <textarea id="messageText" placeholder="Ваше сообщение..." required></textarea>
+                <button type="submit">Отправить</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Поиск духовного наставника. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>

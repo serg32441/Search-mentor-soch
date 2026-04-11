@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск лотов по банкротству</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .search-box {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .search-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .search-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            grid-column: 1 / -1;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .results-section {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .results-header h2 {
+            color: #333;
+            font-size: 1.8em;
+        }
+
+        .lot-count {
+            background: #667eea;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .lot-card {
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .lot-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+
+        .lot-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .lot-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #333;
+            flex: 1;
+        }
+
+        .lot-price {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1.2em;
+            white-space: nowrap;
+        }
+
+        .lot-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .detail-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .detail-value {
+            font-size: 1em;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .lot-description {
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .lot-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+            border: none;
+            font-size: 0.95em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-box h3 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .info-box ul {
+            margin-left: 20px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .search-box,
+            .results-section {
+                padding: 20px;
+            }
+
+            .lot-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .lot-price {
+                width: 100%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔍 Поиск лотов по банкротству</h1>
+            <p>Найдите выгодные предложения на торгах по банкротству</p>
+        </header>
+
+        <div class="info-box">
+            <h3>ℹ️ Как это работает?</h3>
+            <ul>
+                <li>Введите параметры поиска (название, регион, цену)</li>
+                <li>Нажмите кнопку "Найти лоты"</li>
+                <li>Изучите результаты и выберите подходящий лот</li>
+                <li>Свяжитесь с организатором торгов для участия</li>
+            </ul>
+        </div>
+
+        <div class="search-box">
+            <form class="search-form" id="searchForm">
+                <div class="form-group">
+                    <label for="searchQuery">📝 Название или описание</label>
+                    <input type="text" id="searchQuery" placeholder="Например: автомобиль, квартира, оборудование">
+                </div>
+
+                <div class="form-group">
+                    <label for="region">📍 Регион</label>
+                    <select id="region">
+                        <option value="">Все регионы</option>
+                        <option value="Москва">Москва</option>
+                        <option value="Санкт-Петербург">Санкт-Петербург</option>
+                        <option value="Московская область">Московская область</option>
+                        <option value="Ленинградская область">Ленинградская область</option>
+                        <option value="Краснодарский край">Краснодарский край</option>
+                        <option value="Свердловская область">Свердловская область</option>
+                        <option value="Новосибирская область">Новосибирская область</option>
+                        <option value="Республика Татарстан">Республика Татарстан</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">🏷️ Категория</label>
+                    <select id="category">
+                        <option value="">Все категории</option>
+                        <option value="Недвижимость">Недвижимость</option>
+                        <option value="Транспорт">Транспорт</option>
+                        <option value="Оборудование">Оборудование</option>
+                        <option value="Ценные бумаги">Ценные бумаги</option>
+                        <option value="Имущество предприятий">Имущество предприятий</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="minPrice">💰 Минимальная цена (₽)</label>
+                    <input type="number" id="minPrice" placeholder="От" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="maxPrice">💰 Максимальная цена (₽)</label>
+                    <input type="number" id="maxPrice" placeholder="До" min="0">
+                </div>
+
+                <button type="submit" class="search-btn">🔍 Найти лоты</button>
+            </form>
+        </div>
+
+        <div class="results-section">
+            <div class="results-header">
+                <h2>📋 Результаты поиска</h2>
+                <div class="lot-count" id="lotCount">0 лотов найдено</div>
+            </div>
+
+            <div id="resultsContainer">
+                <div class="no-results">
+                    <h3>Начните поиск</h3>
+                    <p>Введите параметры в форму выше и нажмите "Найти лоты", чтобы увидеть результаты</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Пример данных лотов (в реальном проекте данные будут приходить с сервера)
+        const sampleLots = [
+            {
+                id: 1,
+                title: "Двухкомнатная квартира в центре Москвы",
+                price: 12500000,
+                region: "Москва",
+                category: "Недвижимость",
+                description: "Просторная двухкомнатная квартира площадью 65 кв.м. в историческом центре Москвы. Требуется косметический ремонт. Отличная транспортная доступность.",
+                debtor: "ООО \"СтройИнвест\"",
+                auctionDate: "2024-02-15",
+                link: "#"
+            },
+            {
+                id: 2,
+                title: "Автомобиль BMW X5 2020 года",
+                price: 4200000,
+                region: "Санкт-Петербург",
+                category: "Транспорт",
+                description: "BMW X5 в отличном техническом состоянии. Пробег 45 000 км. Один владелец. Полная сервисная история. Комплект зимней резины.",
+                debtor: "ИП Петров А.В.",
+                auctionDate: "2024-02-20",
+                link: "#"
+            },
+            {
+                id: 3,
+                title: "Производственное оборудование для цеха",
+                price: 8900000,
+                region: "Свердловская область",
+                category: "Оборудование",
+                description: "Комплекс производственного оборудования: станки ЧПУ, конвейерные линии, упаковочное оборудование. В рабочем состоянии.",
+                debtor: "ЗАО \"УралМаш\"",
+                auctionDate: "2024-02-25",
+                link: "#"
+            },
+            {
+                id: 4,
+                title: "Загородный дом с участком",
+                price: 6700000,
+                region: "Московская область",
+                category: "Недвижимость",
+                description: "Двухэтажный коттедж 180 кв.м. на участке 12 соток. Все коммуникации. Развитая инфраструктура поселка.",
+                debtor: "ИП Сидоров К.М.",
+                auctionDate: "2024-03-01",
+                link: "#"
+            },
+            {
+                id: 5,
+                title: "Грузовой автомобиль Mercedes-Benz Actros",
+                price: 3500000,
+                region: "Краснодарский край",
+                category: "Транспорт",
+                description: "Тягач Mercedes-Benz Actros 2019 года. Грузоподъемность 20 тонн. Пробег 180 000 км. После ТО.",
+                debtor: "ООО \"ТрансЛогистик\"",
+                auctionDate: "2024-03-05",
+                link: "#"
+            },
+            {
+                id: 6,
+                title: "Офисное помещение 120 кв.м.",
+                price: 9200000,
+                region: "Москва",
+                category: "Недвижимость",
+                description: "Офис класса Б в деловом центре. Открытая планировка, панорамные окна. Ремонт 2022 года.",
+                debtor: "ООО \"БизнесКонсалт\"",
+                auctionDate: "2024-03-10",
+                link: "#"
+            },
+            {
+                id: 7,
+                title: "Сельскохозяйственная техника",
+                price: 2100000,
+                region: "Республика Татарстан",
+                category: "Оборудование",
+                description: "Трактор МТЗ-82, сеялка, опрыскиватель. Техника в рабочем состоянии, готова к эксплуатации.",
+                debtor: "КФХ Иванов А.П.",
+                auctionDate: "2024-03-15",
+                link: "#"
+            },
+            {
+                id: 8,
+                title: "Складской комплекс 500 кв.м.",
+                price: 15000000,
+                region: "Новосибирская область",
+                category: "Недвижимость",
+                description: "Складское помещение с офисной частью. Высота потолков 6м. Удобный подъезд для фур.",
+                debtor: "ООО \"СибЛогистика\"",
+                auctionDate: "2024-03-20",
+                link: "#"
+            }
+        ];
+
+        // Функция форматирования цены
+        function formatPrice(price) {
+            return new Intl.NumberFormat('ru-RU').format(price) + ' ₽';
+        }
+
+        // Функция отображения лотов
+        function displayLots(lots) {
+            const container = document.getElementById('resultsContainer');
+            const countElement = document.getElementById('lotCount');
+            
+            countElement.textContent = `${lots.length} лотов найдено`;
+
+            if (lots.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <h3>😔 Ничего не найдено</h3>
+                        <p>По вашим параметрам не найдено лотов. Попробуйте изменить критерии поиска.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = lots.map(lot => `
+                <div class="lot-card">
+                    <div class="lot-header">
+                        <div class="lot-title">${lot.title}</div>
+                        <div class="lot-price">${formatPrice(lot.price)}</div>
+                    </div>
+                    
+                    <div class="lot-details">
+                        <div class="detail-item">
+                            <div class="detail-label">📍 Регион</div>
+                            <div class="detail-value">${lot.region}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">🏷️ Категория</div>
+                            <div class="detail-value">${lot.category}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">🏢 Должник</div>
+                            <div class="detail-value">${lot.debtor}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">📅 Дата торгов</div>
+                            <div class="detail-value">${formatDate(lot.auctionDate)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="lot-description">
+                        ${lot.description}
+                    </div>
+                    
+                    <div class="lot-actions">
+                        <a href="${lot.link}" class="btn btn-primary">Подробнее</a>
+                        <button class="btn btn-secondary" onclick="saveLot(${lot.id})">Сохранить</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Функция форматирования даты
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ru-RU', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        // Функция фильтрации лотов
+        function filterLots(searchQuery, region, category, minPrice, maxPrice) {
+            return sampleLots.filter(lot => {
+                const matchesQuery = !searchQuery || 
+                    lot.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    lot.description.toLowerCase().includes(searchQuery.toLowerCase());
+                
+                const matchesRegion = !region || lot.region === region;
+                const matchesCategory = !category || lot.category === category;
+                const matchesMinPrice = !minPrice || lot.price >= minPrice;
+                const matchesMaxPrice = !maxPrice || lot.price <= maxPrice;
+                
+                return matchesQuery && matchesRegion && matchesCategory && matchesMinPrice && matchesMaxPrice;
+            });
+        }
+
+        // Обработчик отправки формы
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const searchQuery = document.getElementById('searchQuery').value.trim();
+            const region = document.getElementById('region').value;
+            const category = document.getElementById('category').value;
+            const minPrice = document.getElementById('minPrice').value ? parseFloat(document.getElementById('minPrice').value) : null;
+            const maxPrice = document.getElementById('maxPrice').value ? parseFloat(document.getElementById('maxPrice').value) : null;
+            
+            const filteredLots = filterLots(searchQuery, region, category, minPrice, maxPrice);
+            displayLots(filteredLots);
+        });
+
+        // Функция сохранения лота (заглушка)
+        function saveLot(lotId) {
+            alert(`Лот #${lotId} сохранен в избранное!`);
+        }
+
+        // Отобразить все лоты при загрузке страницы
+        displayLots(sampleLots);
+    </script>
+</body>
+</html>
